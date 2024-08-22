@@ -20,6 +20,7 @@ type Config struct {
 	DB_USER      string
 	RD_HOST      string
 	RD_PASSWORD  string
+	RD_NAME      int
 }
 
 func Load() Config {
@@ -39,6 +40,7 @@ func Load() Config {
 	config.REFRESH_KEY = cast.ToString(Coalesce("REFRESH_KEY", "secret"))
 	config.RD_HOST = cast.ToString(Coalesce("RD_HOST", "localhost:6379"))
 	config.RD_PASSWORD = cast.ToString(Coalesce("RD_PASSWORD", ""))
+	config.RD_NAME = cast.ToInt(Coalesce("RD_NAME", 0))
 
 	return config
 }

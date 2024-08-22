@@ -16,7 +16,7 @@ func ConnectDB() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     cfg.RD_HOST,
 		Password: cfg.RD_PASSWORD,
-		DB:       0,
+		DB:       cfg.RD_NAME,
 	})
 
 	return rdb
