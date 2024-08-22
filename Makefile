@@ -2,7 +2,8 @@ CURRENT_DIR=$(shell pwd)
 DBURL := postgres://macbookpro:1111@localhost:5432/auth?sslmode=disable
 
 proto-gen:
-	./scripts/gen-proto.sh ${CURRENT_DIR}
+	./script/gen-proto.sh /Users/macbookpro/go/src/github.com/GoogleDocs/google_docs_UserService
+
 
 
 mig-up:
