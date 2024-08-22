@@ -15,3 +15,5 @@ type UserRepository struct {
 func NewUserRepository(db *sql.DB) storage.IUserStorage {
 	return &UserRepository{Db: db, Log: logger.NewLogger()}
 }
+
+func 

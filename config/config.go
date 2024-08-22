@@ -41,6 +41,9 @@ func Load() Config {
 	config.RD_NAME = cast.ToInt(Coalesce("RD_NAME",0))
 	config.SIGNING_KEY = cast.ToString(Coalesce("SIGNING_KEY", "GOoGLe_DoCs"))
 	config.REFRESH_KEY = cast.ToString(Coalesce("REFRESH_KEY", "secret"))
+	config.RD_HOST = cast.ToString(Coalesce("RD_HOST", "localhost:6379"))
+	config.RD_PASSWORD = cast.ToString(Coalesce("RD_PASSWORD", ""))
+	config.RD_NAME = cast.ToInt(Coalesce("RD_NAME", 0))
 
 	return config
 }
