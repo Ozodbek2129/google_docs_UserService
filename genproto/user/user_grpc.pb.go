@@ -29,6 +29,7 @@ const (
 	UserService_UpdateUser_FullMethodName           = "/user.UserService/UpdateUser"
 	UserService_DeleteUser_FullMethodName           = "/user.UserService/DeleteUser"
 	UserService_UpdateRole_FullMethodName           = "/user.UserService/UpdateRole"
+	UserService_ProfileImage_FullMethodName         = "/user.UserService/ProfileImage"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -45,6 +46,7 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserRespose, error)
 	DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*DeleteUserr, error)
 	UpdateRole(ctx context.Context, in *UpdateRoleReq, opts ...grpc.CallOption) (*UpdateRoleRes, error)
+	ProfileImage(ctx context.Context, in *ImageReq, opts ...grpc.CallOption) (*ImageRes, error)
 }
 
 type userServiceClient struct {
@@ -155,6 +157,16 @@ func (c *userServiceClient) UpdateRole(ctx context.Context, in *UpdateRoleReq, o
 	return out, nil
 }
 
+func (c *userServiceClient) ProfileImage(ctx context.Context, in *ImageReq, opts ...grpc.CallOption) (*ImageRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ImageRes)
+	err := c.cc.Invoke(ctx, UserService_ProfileImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -169,6 +181,7 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserRespose, error)
 	DeleteUser(context.Context, *UserId) (*DeleteUserr, error)
 	UpdateRole(context.Context, *UpdateRoleReq) (*UpdateRoleRes, error)
+	ProfileImage(context.Context, *ImageReq) (*ImageRes, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -205,6 +218,9 @@ func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserId) (*Del
 }
 func (UnimplementedUserServiceServer) UpdateRole(context.Context, *UpdateRoleReq) (*UpdateRoleRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRole not implemented")
+}
+func (UnimplementedUserServiceServer) ProfileImage(context.Context, *ImageReq) (*ImageRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProfileImage not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -399,6 +415,24 @@ func _UserService_UpdateRole_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_ProfileImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ProfileImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_ProfileImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ProfileImage(ctx, req.(*ImageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -445,6 +479,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateRole",
 			Handler:    _UserService_UpdateRole_Handler,
+		},
+		{
+			MethodName: "ProfileImage",
+			Handler:    _UserService_ProfileImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
