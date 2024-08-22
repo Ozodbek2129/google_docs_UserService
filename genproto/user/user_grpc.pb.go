@@ -30,6 +30,7 @@ const (
 	UserService_DeleteUser_FullMethodName           = "/user.UserService/DeleteUser"
 	UserService_UpdateRole_FullMethodName           = "/user.UserService/UpdateRole"
 	UserService_ProfileImage_FullMethodName         = "/user.UserService/ProfileImage"
+	UserService_StoreRefreshToken_FullMethodName    = "/user.UserService/StoreRefreshToken"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -42,11 +43,12 @@ type UserServiceClient interface {
 	GetUSerByEmail(ctx context.Context, in *GetUSerByEmailReq, opts ...grpc.CallOption) (*GetUserResponse, error)
 	UpdatePassword(ctx context.Context, in *UpdatePasswordReq, opts ...grpc.CallOption) (*UpdatePasswordRes, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRes, error)
-	ConfirmationPassword(ctx context.Context, in *ConfirmationReset, opts ...grpc.CallOption) (*ConfirmationResponse, error)
+	ConfirmationPassword(ctx context.Context, in *ConfirmationReq, opts ...grpc.CallOption) (*ConfirmationResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserRespose, error)
 	DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*DeleteUserr, error)
 	UpdateRole(ctx context.Context, in *UpdateRoleReq, opts ...grpc.CallOption) (*UpdateRoleRes, error)
 	ProfileImage(ctx context.Context, in *ImageReq, opts ...grpc.CallOption) (*ImageRes, error)
+	StoreRefreshToken(ctx context.Context, in *StoreRefreshTokenReq, opts ...grpc.CallOption) (*StoreRefReshTokenRes, error)
 }
 
 type userServiceClient struct {
@@ -117,7 +119,7 @@ func (c *userServiceClient) ResetPassword(ctx context.Context, in *ResetPassword
 	return out, nil
 }
 
-func (c *userServiceClient) ConfirmationPassword(ctx context.Context, in *ConfirmationReset, opts ...grpc.CallOption) (*ConfirmationResponse, error) {
+func (c *userServiceClient) ConfirmationPassword(ctx context.Context, in *ConfirmationReq, opts ...grpc.CallOption) (*ConfirmationResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ConfirmationResponse)
 	err := c.cc.Invoke(ctx, UserService_ConfirmationPassword_FullMethodName, in, out, cOpts...)
@@ -167,6 +169,16 @@ func (c *userServiceClient) ProfileImage(ctx context.Context, in *ImageReq, opts
 	return out, nil
 }
 
+func (c *userServiceClient) StoreRefreshToken(ctx context.Context, in *StoreRefreshTokenReq, opts ...grpc.CallOption) (*StoreRefReshTokenRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StoreRefReshTokenRes)
+	err := c.cc.Invoke(ctx, UserService_StoreRefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -177,11 +189,12 @@ type UserServiceServer interface {
 	GetUSerByEmail(context.Context, *GetUSerByEmailReq) (*GetUserResponse, error)
 	UpdatePassword(context.Context, *UpdatePasswordReq) (*UpdatePasswordRes, error)
 	ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRes, error)
-	ConfirmationPassword(context.Context, *ConfirmationReset) (*ConfirmationResponse, error)
+	ConfirmationPassword(context.Context, *ConfirmationReq) (*ConfirmationResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserRespose, error)
 	DeleteUser(context.Context, *UserId) (*DeleteUserr, error)
 	UpdateRole(context.Context, *UpdateRoleReq) (*UpdateRoleRes, error)
 	ProfileImage(context.Context, *ImageReq) (*ImageRes, error)
+	StoreRefreshToken(context.Context, *StoreRefreshTokenReq) (*StoreRefReshTokenRes, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -207,7 +220,7 @@ func (UnimplementedUserServiceServer) UpdatePassword(context.Context, *UpdatePas
 func (UnimplementedUserServiceServer) ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
 }
-func (UnimplementedUserServiceServer) ConfirmationPassword(context.Context, *ConfirmationReset) (*ConfirmationResponse, error) {
+func (UnimplementedUserServiceServer) ConfirmationPassword(context.Context, *ConfirmationReq) (*ConfirmationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfirmationPassword not implemented")
 }
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserRespose, error) {
@@ -221,6 +234,9 @@ func (UnimplementedUserServiceServer) UpdateRole(context.Context, *UpdateRoleReq
 }
 func (UnimplementedUserServiceServer) ProfileImage(context.Context, *ImageReq) (*ImageRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProfileImage not implemented")
+}
+func (UnimplementedUserServiceServer) StoreRefreshToken(context.Context, *StoreRefreshTokenReq) (*StoreRefReshTokenRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StoreRefreshToken not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -344,7 +360,7 @@ func _UserService_ResetPassword_Handler(srv interface{}, ctx context.Context, de
 }
 
 func _UserService_ConfirmationPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConfirmationReset)
+	in := new(ConfirmationReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -356,7 +372,7 @@ func _UserService_ConfirmationPassword_Handler(srv interface{}, ctx context.Cont
 		FullMethod: UserService_ConfirmationPassword_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).ConfirmationPassword(ctx, req.(*ConfirmationReset))
+		return srv.(UserServiceServer).ConfirmationPassword(ctx, req.(*ConfirmationReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -433,6 +449,24 @@ func _UserService_ProfileImage_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_StoreRefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StoreRefreshTokenReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).StoreRefreshToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_StoreRefreshToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).StoreRefreshToken(ctx, req.(*StoreRefreshTokenReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -483,6 +517,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ProfileImage",
 			Handler:    _UserService_ProfileImage_Handler,
+		},
+		{
+			MethodName: "StoreRefreshToken",
+			Handler:    _UserService_StoreRefreshToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
