@@ -18,11 +18,14 @@ type Config struct {
 	SIGNING_KEY  string
 	REFRESH_KEY  string
 	DB_USER      string
+	RD_HOST      string
+	RD_PASSWORD  string
+	RD_NAME      int
 }
 
 func Load() Config {
 	if err := godotenv.Load(".env"); err != nil {
-			log.Print("No .env file found?")
+		log.Print("No .env file found?")
 	}
 
 	config := Config{}
@@ -33,6 +36,9 @@ func Load() Config {
 	config.DB_NAME = cast.ToString(Coalesce("DB_NAME", "google_docs"))
 	config.DB_PASSWORD = cast.ToString(Coalesce("DB_PASSWORD", "salom"))
 	config.DB_PORT = cast.ToInt(Coalesce("DB_PORT", 5432))
+	config.RD_HOST = cast.ToString(Coalesce("RD_HOST","localhost:6379"))
+	config.RD_PASSWORD = cast.ToString(Coalesce("RD_PASSWORD",""))
+	config.RD_NAME = cast.ToInt(Coalesce("RD_NAME",0))
 	config.SIGNING_KEY = cast.ToString(Coalesce("SIGNING_KEY", "GOoGLe_DoCs"))
 	config.REFRESH_KEY = cast.ToString(Coalesce("REFRESH_KEY", "secret"))
 
@@ -41,7 +47,7 @@ func Load() Config {
 
 func Coalesce(key string, defaultValue interface{}) interface{} {
 	if value, ok := os.LookupEnv(key); ok {
-			return value
+		return value
 	}
 	return defaultValue
 }
