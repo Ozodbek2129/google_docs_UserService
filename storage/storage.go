@@ -19,4 +19,5 @@ type IUserStorage interface {
 	UpdateUser(context.Context, *pb.UpdateUserRequest) (*pb.UpdateUserRespose,error)
 	DeleteUser(context.Context, *pb.UserId) (*pb.DeleteUserr,error)
 	UpdateRole(context.Context, *pb.UpdateRoleReq) (*pb.UpdateRoleRes,error)
+	ProfileImage(ctx context.Context,req *pb.ImageReq)(*pb.ImageRes,error)
 }

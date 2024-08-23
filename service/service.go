@@ -106,3 +106,12 @@ func (s *UserService) UpdateRole(ctx context.Context,req *pb.UpdateRoleReq)(*pb.
 	}
 	return res, nil
 }
+
+func (s *UserService) ProfileImage(ctx context.Context,req *pb.ImageReq)(*pb.ImageRes,error){
+	res, err := s.User.User().ProfileImage(ctx, req)
+	if err != nil {
+		s.Logger.Error("failed to UpdateRole user", "error", err)
+		return nil, err
+	}
+	return res, nil
+}

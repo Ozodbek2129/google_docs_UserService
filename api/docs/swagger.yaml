@@ -1,0 +1,472 @@
+basePath: /e-commerce
+definitions:
+  models.Register:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+    type: object
+  user.ConfirmationRegisterRes:
+    properties:
+      user:
+        $ref: '#/definitions/user.User'
+    type: object
+  user.ConfirmationReq:
+    properties:
+      code:
+        type: integer
+      email:
+        type: string
+      new_password:
+        type: string
+    type: object
+  user.ConfirmationResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  user.DeleteUserr:
+    properties:
+      message:
+        type: string
+    type: object
+  user.GetUserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/user.User'
+    type: object
+  user.LoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  user.RegisterRes:
+    properties:
+      message:
+        type: string
+    type: object
+  user.ResetPasswordRes:
+    properties:
+      message:
+        type: string
+    type: object
+  user.UpdatePasswordRes:
+    properties:
+      message:
+        type: string
+    type: object
+  user.UpdateRoleRes:
+    properties:
+      message:
+        type: string
+    type: object
+  user.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+    type: object
+  user.UpdateUserRespose:
+    properties:
+      message:
+        type: string
+    type: object
+  user.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+  description: This is an API for e-commerce platform.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: E-Commerce API
+  version: "1.0"
+paths:
+  /auth/confirm/{email}/{code}:
+    get:
+      consumes:
+      - application/json
+      description: This endpoint confirms user registration by verifying the email
+        and confirmation code.
+      parameters:
+      - description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Confirmation Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.ConfirmationRegisterRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Confirm user registration
+      tags:
+      - auth
+  /auth/confirmation_password:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint confirms the new password by updating the user's
+        password after validation.
+      parameters:
+      - description: Confirmation Data
+        in: body
+        name: confirmation
+        required: true
+        schema:
+          $ref: '#/definitions/user.ConfirmationReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.ConfirmationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Confirm new password
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint logs in a user by checking the credentials and generating
+        JWT tokens.
+      parameters:
+      - description: User Login Data
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/user.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Tokens
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login a user
+      tags:
+      - auth
+  /auth/products/media:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Api for upload a new photo
+      parameters:
+      - description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: createUserModel
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Upload Photo
+      tags:
+      - auth_media
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint registers a new user by taking user details, hashing
+        the password, and generating a confirmation code.
+      parameters:
+      - description: User Registration Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.Register'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/user.RegisterRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - auth
+  /auth/reset_password/{email}:
+    get:
+      consumes:
+      - application/json
+      description: This endpoint sends a password reset email to the specified email
+        address.
+      parameters:
+      - description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.ResetPasswordRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Reset user password
+      tags:
+      - auth
+  /auth/update_role/{email}/{role}:
+    put:
+      consumes:
+      - application/json
+      description: This endpoint updates the user's role based on the provided email
+        and new role.
+      parameters:
+      - description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: New User Role
+        in: path
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UpdateRoleRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update user role
+      tags:
+      - auth
+  /delete_user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: This endpoint deletes a user based on the provided user ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.DeleteUserr'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete user
+      tags:
+      - user
+  /update_user:
+    put:
+      consumes:
+      - application/json
+      description: This endpoint updates the user's details based on the provided
+        information.
+      parameters:
+      - description: User Update Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UpdateUserRespose'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update user details
+      tags:
+      - user
+  /user/{email}:
+    get:
+      consumes:
+      - application/json
+      description: This endpoint retrieves user details by email.
+      parameters:
+      - description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.GetUserResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get user by email
+      tags:
+      - user
+  /user/update_password/{email}/{old_password}/{new_password}:
+    put:
+      consumes:
+      - application/json
+      description: This endpoint updates the user password after validating the old
+        password.
+      parameters:
+      - description: Old Password
+        in: path
+        name: old_password
+        required: true
+        type: string
+      - description: New Password
+        in: path
+        name: new_password
+        required: true
+        type: string
+      - description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UpdatePasswordRes'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update user password
+      tags:
+      - user
+swagger: "2.0"

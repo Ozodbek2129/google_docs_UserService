@@ -230,3 +230,7 @@ func (u *UserRepository) UpdateRole(ctx context.Context, req *pb.UpdateRoleReq) 
 		Message: "Role updated successfully",
 	}, nil
 }
+
+func (u *UserRepository) ProfileImage(ctx context.Context,req *pb.ImageReq)(*pb.ImageRes,error){
+	return nil,nil
+}

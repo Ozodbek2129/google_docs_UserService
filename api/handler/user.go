@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -25,10 +26,10 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        user  body      models.Register  true  "User Registration Data"
-// @Success      202   {object}  user.RegisterResp
+// @Success      202   {object}  user.RegisterRes
 // @Failure      400   {object}  string
 // @Failure      500   {object}  string
-// @Router       /register [post]
+// @Router       /auth/register [post]
 func (h Handler) Register(c *gin.Context) {
 	req := models.Register{}
 
@@ -77,11 +78,11 @@ func (h Handler) Register(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        credentials  body      user.LoginReq  true  "User Login Data"
-// @Success      202   {object}  token.Tokens
+// @Success      202   {object}  string "Tokens"
 // @Failure      400   {object}  string
 // @Failure      401   {object}  string
 // @Failure      500   {object}  string
-// @Router       /login [post]
+// @Router       /auth/login [post]
 func (h Handler) LoginUser(c *gin.Context) {
 	req := pb.LoginReq{}
 
@@ -136,10 +137,10 @@ func (h Handler) LoginUser(c *gin.Context) {
 // @Produce      json
 // @Param        email  path      string  true  "User Email"
 // @Param        code   path      string  true  "Confirmation Code"
-// @Success      200    {object}  user.ConfirmationRegisterResp
+// @Success      200    {object}  user.ConfirmationRegisterRes
 // @Failure      400    {object}  string
 // @Failure      500    {object}  string
-// @Router       /confirm/{email}/{code} [get]
+// @Router       /auth/confirm/{email}/{code} [get]
 func (h Handler) ConfirmationRegister(c *gin.Context) {
 	codestr := c.Param("code")
 
@@ -173,7 +174,7 @@ func (h Handler) ConfirmationRegister(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        email  path      string  true  "User Email"
-// @Success      200    {object}  user.GetUSerByEmailResp
+// @Success      200    {object}  user.GetUserResponse
 // @Failure      500    {object}  string
 // @Router       /user/{email} [get]
 func (h Handler) GetUSerByEmail(c *gin.Context) {
@@ -201,7 +202,7 @@ func (h Handler) GetUSerByEmail(c *gin.Context) {
 // @Param        old_password  path      string  true  "Old Password"
 // @Param        new_password  path      string  true  "New Password"
 // @Param        email         path      string  true  "User Email"
-// @Success      200    {object}  user.UpdatePasswordResp
+// @Success      200    {object}  user.UpdatePasswordRes
 // @Failure      401    {object}  string
 // @Failure      500    {object}  string
 // @Router       /user/update_password/{email}/{old_password}/{new_password} [put]
@@ -258,10 +259,10 @@ func (h Handler) UpdatePassword(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        email  path      string  true  "User Email"
-// @Success      200    {object}  user.ResetPasswordResp
+// @Success      200    {object}  user.ResetPasswordRes
 // @Failure      400    {object}  string
 // @Failure      500    {object}  string
-// @Router       /reset_password/{email} [get]
+// @Router       /auth/reset_password/{email} [get]
 func (h Handler) ResetPassword(c *gin.Context) {
 	req := pb.ResetPasswordReq{
 		Email: c.Param("email"),
@@ -285,10 +286,10 @@ func (h Handler) ResetPassword(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        confirmation  body      user.ConfirmationReq  true  "Confirmation Data"
-// @Success      200    {object}  user.ConfirmationPasswordResp
+// @Success      200    {object}  user.ConfirmationResponse
 // @Failure      400    {object}  string
 // @Failure      500    {object}  string
-// @Router       /confirmation_password [post]
+// @Router       /auth/confirmation_password [post]
 func (h Handler) ConfirmationPassword(c *gin.Context) {
 	req := pb.ConfirmationReq{}
 
@@ -324,7 +325,7 @@ func (h Handler) ConfirmationPassword(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        user  body      user.UpdateUserRequest  true  "User Update Data"
-// @Success      200    {object}  user.UpdateUserResponse
+// @Success      200    {object}  user.UpdateUserRespose
 // @Failure      400    {object}  string
 // @Failure      500    {object}  string
 // @Router       /update_user [put]
@@ -354,7 +355,7 @@ func (h Handler) UpdateUser(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id  path      string  true  "User ID"
-// @Success      200    {object}  user.DeleteUserResponse
+// @Success      200    {object}  user.DeleteUserr
 // @Failure      400    {object}  string
 // @Failure      500    {object}  string
 // @Router       /delete_user/{id} [delete]
@@ -377,15 +378,15 @@ func (h Handler) DeleteUser(c *gin.Context) {
 
 // @Summary      Update user role
 // @Description  This endpoint updates the user's role based on the provided email and new role.
-// @Tags         user
+// @Tags         auth
 // @Accept       json
 // @Produce      json
 // @Param        email  path      string  true  "User Email"
 // @Param        role   path      string  true  "New User Role"
-// @Success      200    {object}  user.UpdateRoleResponse
+// @Success      200    {object}  user.UpdateRoleRes
 // @Failure      400    {object}  string
 // @Failure      500    {object}  string
-// @Router       /update_role/{email}/{role} [put]
+// @Router       /auth/update_role/{email}/{role} [put]
 func (h Handler) UpdateRole(c *gin.Context) {
 	req := pb.UpdateRoleReq{
 		Email: c.Param("email"),
@@ -402,4 +403,47 @@ func (h Handler) UpdateRole(c *gin.Context) {
 	}
 
 	c.JSON(200, res)
+}
+
+// @Summary Upload Photo
+// @Description Api for upload a new photo
+// @Tags auth_media
+// @Accept multipart/form-data
+// @Param        email  path      string  true  "User Email"
+// @Param file formData file true "createUserModel"
+// @Success 200 {object} string
+// @Failure 400 {object} string
+// @Failure 500 {object} string
+// @Router /auth/products/media [post]
+func (h Handler) UploadMedia(c *gin.Context) {
+	email := c.Param("email")
+
+	header, err := c.FormFile("file")
+	if err != nil {
+		log.Printf("Error getting form file: %v\n", err)
+		c.JSON(400, gin.H{"error": "Bad request"})
+		return
+	}
+
+	header.Filename = email
+
+	url := filepath.Join("media", header.Filename)
+
+	req := pb.ImageReq{
+		Image: url,
+		Email: email,
+	}
+
+	res, err := h.User.ProfileImage(c, &req)
+	if err != nil {
+		h.Log.Error("ProfileImage ga urlni yuborishda xatolik", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": res,
+	})
 }
