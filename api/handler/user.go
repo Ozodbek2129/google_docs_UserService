@@ -175,15 +175,75 @@ func (h Handler) ResetPassword(c *gin.Context){
 		Email: c.Param("email"),
 	}
 
-	res,err:=h.User.ResetPassword(c,&req)
+	res,err:=email.Email(req.Email)
 	if err!=nil{
-		h.Log.Error("ResetPassword funksiyasiga xabar yuborishda xatolik.","error",err.Error())
+		h.Log.Error("Email ga xabar yuuborishda xatolik.","error",err.Error())
+		c.AbortWithStatusJSON(400,gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200,res)
+}
+
+func (h Handler) ConfirmationPassword(c *gin.Context){
+	req:=pb.ConfirmationReq{}
+
+	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	res,err:=h.User.ConfirmationPassword(c,&req)
+	if err!=nil{
+		h.Log.Error("ConfirmationPassword funksiyasiga malumot yuborishda xatolik","error",err.Error())
 		c.AbortWithStatusJSON(500,gin.H{
 			"error":err.Error(),
 		})
 		return
 	}
-	
 
 	c.JSON(200,res)
+}
+
+func (h Handler) UpdateUser(c *gin.Context){
+	req:=pb.UpdateUserRequest{}
+
+	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+	
+	res,err:=h.User.UpdateUser(c,&req)
+	if err!=nil{
+		h.Log.Error("UpdateUser funksiyasoga xabar yuborishda xatolik","error",err.Error())
+		c.AbortWithStatusJSON(500,gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200,res)
+}
+
+func (h Handler) DeleteUser(c *gin.Context){
+	req:=pb.UserId{
+		Id: c.Param("id"),
+	}
+
+	res,err:=h.User.DeleteUser(c,&req)
+	if err!=nil{
+		h.Log.Error("DeleteUserga malumot yuborishda xatolik","error",err.Error())
+		c.AbortWithStatusJSON(500,gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200,res)
+}
+
+func (h Handler) UpdateRole(c *gin.Context){
+	
 }

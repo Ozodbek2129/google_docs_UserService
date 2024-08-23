@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"google_docs_user/config"
-	"google_docs_user/models"
 	"time"
 
 	"github.com/pkg/errors"
@@ -80,21 +79,21 @@ func RegisterUser(ctx context.Context, req *pb.RegisterReq) error {
 }
 
 
-func GetUser(ctx context.Context, email string) (models.Register, error) {
+func GetUser(ctx context.Context, email string) (*pb.RegisterReq, error) {
 	rdb := ConnectDB()
 
     res, err := rdb.Get(ctx, email).Result()
     if err!= nil {
         if err == redis.Nil {
-            return models.Register{}, errors.New("user not found for " + email)
+            return nil, errors.New("user not found for " + email)
         }
-        return models.Register{}, errors.Wrap(err, "failed to get user from redis")
+        return nil, errors.Wrap(err, "failed to get user from redis")
     }
 
-    var user models.Register
+    var user *pb.RegisterReq
     err = json.Unmarshal([]byte(res), &user)
     if err!= nil {
-        return models.Register{}, errors.Wrap(err, "failed to unmarshal user data")
+        return nil, errors.Wrap(err, "failed to unmarshal user data")
     }
 
     return user, nil

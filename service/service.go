@@ -44,7 +44,7 @@ func (s *UserService) StoreRefreshToken(ctx context.Context, req *pb.StoreRefres
 	return res, nil
 }
 
-func (s *UserService) ConfirmationRegister(ctx context.Context, req *pb.ConfirmationReq) (*pb.ConfirmationRes, error) {
+func (s *UserService) ConfirmationRegister(ctx context.Context, req *pb.ConfirmationRegisterReq) (*pb.ConfirmationRegisterRes, error) {
 	res, err := s.User.User().ConfirmationRegister(ctx, req)
 	if err != nil {
 		s.Logger.Error("failed to confirmation register", err)
@@ -66,15 +66,6 @@ func (s *UserService) UpdatePassword(ctx context.Context, req *pb.UpdatePassword
 	res, err := s.User.User().UpdatePassword(ctx, req)
 	if err != nil {
 		s.Logger.Error("failed to update password", err)
-		return nil, err
-	}
-	return res, nil
-}
-
-func (s *UserService) ResetPassword(ctx context.Context, req *pb.ResetPasswordReq) (*pb.ResetPasswordRes, error) {
-	res, err := s.User.User().ResetPassword(ctx, req)
-	if err != nil {
-		s.Logger.Error("failed to reset password", err)
 		return nil, err
 	}
 	return res, nil

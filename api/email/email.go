@@ -27,7 +27,7 @@ func Email(email string) (string, error) {
                 return "", err
         }
 
-        return code, nil
+        return "Sizning emailingizga xabar yuborildi", nil
 }
 
 func SendCode(email string, code string) error {
