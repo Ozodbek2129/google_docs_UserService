@@ -18,4 +18,5 @@ type IUserStorage interface {
 	ConfirmationPassword(context.Context,*pb.ConfirmationReq)(*pb.ConfirmationResponse,error)
 	UpdateUser(context.Context, *pb.UpdateUserRequest) (*pb.UpdateUserRespose,error)
 	DeleteUser(context.Context, *pb.UserId) (*pb.DeleteUserr,error)
+	UpdateRole(context.Context, *pb.UpdateRoleReq) (*pb.UpdateRoleRes,error)
 }

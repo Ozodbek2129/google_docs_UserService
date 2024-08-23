@@ -206,3 +206,25 @@ func (u *UserRepository) DeleteUser(ctx context.Context, req *pb.UserId) (*pb.De
 		Message: "User deleted successfully",
 	}, nil
 }
+
+func (u *UserRepository) UpdateRole(ctx context.Context, req *pb.UpdateRoleReq) (*pb.UpdateRoleReq, error) {
+	query := `UPDATE users SET role = $1 WHERE email = $2 AND deleted_at = 0`
+    res, err := u.Db.ExecContext(ctx, query, req.Role, req.Email)
+    if err!= nil {
+        u.Log.Error("Error updating role ", "err", err)
+        return nil, errors.ErrUnsupported
+    }
+
+    count, err := res.RowsAffected()
+    if err!= nil {
+        u.Log.Error("Error getting rows affected ", "err", err)
+        return nil, errors.ErrUnsupported
+    }
+
+    if count == 0 {
+        u.Log.Error("No user not found ", "email", req.Email)
+        return nil, errors.New("no user found")
+    }
+
+    return req, nil
+}
