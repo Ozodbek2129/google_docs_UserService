@@ -31,7 +31,7 @@ func (u *UserRepository) StoreRefreshToken(ctx context.Context, req *pb.StoreRef
 
 	err := u.Db.QueryRow(query, req.UserId, req.Refresh)
 	if err != nil {
-		u.Log.Error("Error storing refresh token: %v", err)
+		u.Log.Error("Error storing refresh token", "error", err)
 		return nil, errors.ErrUnsupported
 	}
 
@@ -44,23 +44,22 @@ func (u *UserRepository) ConfirmationRegister(ctx context.Context, req *pb.Confi
 
 	res, err := redis.GetUser(ctx, req.Email)
 	if err == nil {
-		u.Log.Error("User already exists with email: %s", req.Email)
-		return nil, err
+		u.Log.Error("User already exists", "email", req.Email)
+		return nil, errors.New("user already exists")
 	}
 
 	if res.Code != req.Code {
-		u.Log.Error("Invalid confirmation code for email: %s", req.Email)
-		return nil, errors.New("Invalid confirmation code")
+		u.Log.Error("Invalid confirmation code", "email", req.Email)
+		return nil, errors.New("invalid confirmation code")
 	}
 
 	id := uuid.NewString()
-	var createdAt string
+	var createdAt, updatedAt string
 
-	query := `INSERT INTO users (id, email, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5) returning created_at. updated_at`
-
-	err = u.Db.QueryRow(query, id, req.Email, res.Password, res.FirstName, res.LastName).Scan(&createdAt)
+	query := `INSERT INTO users (id, email, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5) returning created_at, updated_at`
+	err = u.Db.QueryRow(query, id, req.Email, res.Password, res.FirstName, res.LastName).Scan(&createdAt, &updatedAt)
 	if err != nil {
-		u.Log.Error("Error inserting user: %v", err)
+		u.Log.Error("Error inserting user", "err", err)
 		return nil, err
 	}
 
@@ -72,10 +71,11 @@ func (u *UserRepository) ConfirmationRegister(ctx context.Context, req *pb.Confi
 			LastName:  res.LastName,
 			Password:  res.Password,
 			CreatedAt: createdAt,
-			UpdatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		},
 	}, nil
 }
+
 
 func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error) {
 	var user pb.User
@@ -85,10 +85,10 @@ func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEm
 
 	err := u.Db.QueryRow(query, req.Email).Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.Role, &createdAt, &updatedAt)
 	if err == sql.ErrNoRows {
-		u.Log.Error("No user found with email: %s", req.Email)
-		return nil, errors.New("No user found")
+		u.Log.Error("No user found", "email", req.Email)
+		return nil, errors.New("no user found")
 	} else if err != nil {
-		u.Log.Error("Error getting user by email: %v", err)
+		u.Log.Error("Error getting user by email", "err", err)
 		return nil, err
 	}
 
@@ -100,26 +100,46 @@ func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEm
 	}, nil
 }
 
+
 func (u *UserRepository) UpdatePassword(ctx context.Context, req *pb.UpdatePasswordReq) (*pb.UpdatePasswordRes, error) {
 
 	query := `UPDATE users SET password = $1 WHERE email = $2 AND deleted_at = 0`
 
-	err := u.Db.QueryRow(query, req.NewPassword, req.Email)
+	result, err := u.Db.ExecContext(ctx, query, req.NewPassword, req.Email)
 	if err != nil {
-		u.Log.Error("No user found with email: %s", req.Email)
-		return nil, errors.New("No user found")
-	} else if err != nil {
-		u.Log.Error("Error updating password: %v", err)
+		u.Log.Error("Error updating password", "err", err)
+		return nil, errors.New("error updating password")
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		u.Log.Error("Error retrieving rows affected", "err", err)
 		return nil, errors.ErrUnsupported
 	}
 
+	if rowsAffected == 0 {
+		u.Log.Error("No user found", "email", req.Email)
+		return nil, errors.New("no user found")
+	}
+
 	return &pb.UpdatePasswordRes{
-		Message: "Your Password changed.",
+		Message: "Your password has been changed.",
 	}, nil
 }
 
-func (u *UserRepository) ConfirmationPassword(ctx context.Context, req *pb.ConfirmationReq) (*pb.ConfirmationRes, error) {
-	
+
+func (u *UserRepository) ConfirmationPassword(ctx context.Context, req *pb.ConfirmationReq) (*pb.ConfirmationResponse, error) {
+
+	query := `UPDATE users SET password = $1 WHERE email = $2 AND deleted_at = 0`
+	err := u.Db.QueryRow(query, req.NewPassword, req.Email)
+	if err != nil {
+		u.Log.Error("No user found with email ", "email", req.Email)
+		return nil, errors.New("no user found")
+	}
+
+	return &pb.ConfirmationResponse{
+		Message: "Your Password changed.",
+	}, nil
 }
 
 func (u *UserRepository) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserRespose, error) {
@@ -133,7 +153,7 @@ func (u *UserRepository) UpdateUser(ctx context.Context, req *pb.UpdateUserReque
 	err := u.Db.QueryRowContext(ctx, query, req.Id).Scan(&existingUser.Email, &existingUser.FirstName, &existingUser.LastName)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("user with ID %d not found", req.Id)
+			return nil, fmt.Errorf("user with ID %s not found", req.Id)
 		}
 		return nil, fmt.Errorf("failed to fetch existing user: %v", err)
 	}
@@ -167,19 +187,19 @@ func (u *UserRepository) DeleteUser(ctx context.Context, req *pb.UserId) (*pb.De
 	query := `UPDATE users SET deleted_at = $1 WHERE id = $2 AND deleted_at = 0`
 	res, err := u.Db.ExecContext(ctx, query, time.Now(), req.Id)
 	if err != nil {
-		u.Log.Error("Error deleting user: %v", err)
+		u.Log.Error("Error deleting ", "user", err)
 		return nil, errors.ErrUnsupported
 	}
 
 	count, err := res.RowsAffected()
 	if err != nil {
-		u.Log.Error("Error getting rows affected: %v", err)
+		u.Log.Error("Error getting rows affected ", "err", err)
 		return nil, errors.ErrUnsupported
 	}
 
 	if count == 0 {
-		u.Log.Error("No user found with ID: %d", req.Id)
-		return nil, errors.New("No user found")
+		u.Log.Error("No user found ", "ID", req.Id)
+		return nil, errors.New("no user found")
 	}
 
 	return &pb.DeleteUserr{
