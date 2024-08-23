@@ -252,6 +252,16 @@ func (h Handler) UpdatePassword(c *gin.Context) {
 	c.JSON(200, res)
 }
 
+// @Summary      Reset user password
+// @Description  This endpoint sends a password reset email to the specified email address.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        email  path      string  true  "User Email"
+// @Success      200    {object}  user.ResetPasswordResp
+// @Failure      400    {object}  string
+// @Failure      500    {object}  string
+// @Router       /reset_password/{email} [get]
 func (h Handler) ResetPassword(c *gin.Context) {
 	req := pb.ResetPasswordReq{
 		Email: c.Param("email"),
@@ -269,6 +279,16 @@ func (h Handler) ResetPassword(c *gin.Context) {
 	c.JSON(200, res)
 }
 
+// @Summary      Confirm new password
+// @Description  This endpoint confirms the new password by updating the user's password after validation.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        confirmation  body      user.ConfirmationReq  true  "Confirmation Data"
+// @Success      200    {object}  user.ConfirmationPasswordResp
+// @Failure      400    {object}  string
+// @Failure      500    {object}  string
+// @Router       /confirmation_password [post]
 func (h Handler) ConfirmationPassword(c *gin.Context) {
 	req := pb.ConfirmationReq{}
 
@@ -298,6 +318,16 @@ func (h Handler) ConfirmationPassword(c *gin.Context) {
 	c.JSON(200, res)
 }
 
+// @Summary      Update user details
+// @Description  This endpoint updates the user's details based on the provided information.
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        user  body      user.UpdateUserRequest  true  "User Update Data"
+// @Success      200    {object}  user.UpdateUserResponse
+// @Failure      400    {object}  string
+// @Failure      500    {object}  string
+// @Router       /update_user [put]
 func (h Handler) UpdateUser(c *gin.Context) {
 	req := pb.UpdateUserRequest{}
 
@@ -318,6 +348,16 @@ func (h Handler) UpdateUser(c *gin.Context) {
 	c.JSON(200, res)
 }
 
+// @Summary      Delete user
+// @Description  This endpoint deletes a user based on the provided user ID.
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        id  path      string  true  "User ID"
+// @Success      200    {object}  user.DeleteUserResponse
+// @Failure      400    {object}  string
+// @Failure      500    {object}  string
+// @Router       /delete_user/{id} [delete]
 func (h Handler) DeleteUser(c *gin.Context) {
 	req := pb.UserId{
 		Id: c.Param("id"),
@@ -335,6 +375,17 @@ func (h Handler) DeleteUser(c *gin.Context) {
 	c.JSON(200, res)
 }
 
+// @Summary      Update user role
+// @Description  This endpoint updates the user's role based on the provided email and new role.
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        email  path      string  true  "User Email"
+// @Param        role   path      string  true  "New User Role"
+// @Success      200    {object}  user.UpdateRoleResponse
+// @Failure      400    {object}  string
+// @Failure      500    {object}  string
+// @Router       /update_role/{email}/{role} [put]
 func (h Handler) UpdateRole(c *gin.Context) {
 	req := pb.UpdateRoleReq{
 		Email: c.Param("email"),
