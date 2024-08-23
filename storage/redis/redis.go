@@ -10,6 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
+	pb "google_docs_user/genproto/user"
 )
 
 func ConnectDB() *redis.Client {
@@ -62,7 +63,7 @@ func DeleteCode(ctx context.Context, email string) error {
 	return nil
 }
 
-func RegisterUser(ctx context.Context, code string, req models.Register) error {
+func RegisterUser(ctx context.Context, req *pb.RegisterReq) error {
 	rdb := ConnectDB()
 
 	res, err := json.Marshal(req)

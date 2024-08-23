@@ -11,7 +11,6 @@ type IStorage interface {
 }
 
 type IUserStorage interface {
-	CreateUser(context.Context, *pb.RegisterReq) (*pb.RegisterRes, error)
 	StoreRefreshToken(context.Context, *pb.StoreRefreshTokenReq) (*pb.StoreRefReshTokenRes, error)
 	ConfirmationRegister(context.Context, *pb.ConfirmationReq) (*pb.ConfirmationRes,error)
 	GetUserByEmail(context.Context, *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error)

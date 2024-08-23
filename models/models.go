@@ -5,5 +5,5 @@ type Register struct {
 	Password  string `json:"password"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
-	Code      int64 `json:"code"`
+	// Code      int64 `json:"code"`
 }

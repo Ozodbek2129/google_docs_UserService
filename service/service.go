@@ -6,13 +6,14 @@ import (
 	pb "google_docs_user/genproto/user"
 	"google_docs_user/storage"
 	"google_docs_user/storage/postgres"
+	"google_docs_user/storage/redis"
 	"log/slog"
 )
 
 type UserService struct {
 	pb.UnimplementedUserServiceServer
-	User   storage.IStorage
-	
+	User storage.IStorage
+
 	Logger *slog.Logger
 }
 
@@ -24,16 +25,18 @@ func NewUserService(db *sql.DB, Logger *slog.Logger) *UserService {
 }
 
 func (s *UserService) CreateUser(ctx context.Context, req *pb.RegisterReq) (*pb.RegisterRes, error) {
-	res, err := s.User.User().CreateUser(ctx, req)
+	err := redis.RegisterUser(ctx, req)
 	if err != nil {
 		s.Logger.Error("failed to create user", err)
 		return nil, err
 	}
-	return res, nil	
+	return &pb.RegisterRes{
+		Message: "Sizning pochtangizga xabar yubordik.",
+	}, nil
 }
 
-func (s *UserService) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
-	res, err := s.User.User().Login(ctx, req)
+func (s *UserService) StoreRefreshToken(ctx context.Context, req *pb.StoreRefreshTokenReq) (*pb.StoreRefReshTokenRes, error) {
+	res, err := s.User.User().StoreRefreshToken(ctx, req)
 	if err != nil {
 		s.Logger.Error("failed to login user", err)
 		return nil, err
@@ -77,7 +80,7 @@ func (s *UserService) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 	return res, nil
 }
 
-func (s *UserService) ConfirmationPassword(ctx context.Context, req *pb.ConfirmationReset) (*pb.ConfirmationResponse, error) {
+func (s *UserService) ConfirmationPassword(ctx context.Context, req *pb.ConfirmationReq) (*pb.ConfirmationResponse, error) {
 	res, err := s.User.User().ConfirmationPassword(ctx, req)
 	if err != nil {
 		s.Logger.Error("failed to confirmation password", err)
