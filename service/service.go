@@ -97,3 +97,12 @@ func (s *UserService) DeleteUser(ctx context.Context, req *pb.UserId) (*pb.Delet
 	}
 	return res, nil
 }
+
+func (s *UserService) UpdateRole(ctx context.Context,req *pb.UpdateRoleReq)(*pb.UpdateRoleRes,error){
+	res, err := s.User.User().UpdateRole(ctx, req)
+	if err != nil {
+		s.Logger.Error("failed to UpdateRole user", err)
+		return nil, err
+	}
+	return res, nil
+}

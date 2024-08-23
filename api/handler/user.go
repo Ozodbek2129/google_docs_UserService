@@ -19,6 +19,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// @Summary      Register a new user
+// @Description  This endpoint registers a new user by taking user details, hashing the password, and generating a confirmation code.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      models.Register  true  "User Registration Data"
+// @Success      202   {object}  user.RegisterResp
+// @Failure      400   {object}  string
+// @Failure      500   {object}  string
+// @Router       /register [post]
 func (h Handler) Register(c *gin.Context) {
 	req := models.Register{}
 
@@ -61,6 +71,17 @@ func (h Handler) Register(c *gin.Context) {
 	c.JSON(http.StatusAccepted, resp)
 }
 
+// @Summary      Login a user
+// @Description  This endpoint logs in a user by checking the credentials and generating JWT tokens.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        credentials  body      user.LoginReq  true  "User Login Data"
+// @Success      202   {object}  token.Tokens
+// @Failure      400   {object}  string
+// @Failure      401   {object}  string
+// @Failure      500   {object}  string
+// @Router       /login [post]
 func (h Handler) LoginUser(c *gin.Context) {
 	req := pb.LoginReq{}
 
@@ -107,6 +128,18 @@ func (h Handler) LoginUser(c *gin.Context) {
 	c.JSON(http.StatusAccepted, token)
 }
 
+// ConfirmationRegister godoc
+// @Summary      Confirm user registration
+// @Description  This endpoint confirms user registration by verifying the email and confirmation code.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        email  path      string  true  "User Email"
+// @Param        code   path      string  true  "Confirmation Code"
+// @Success      200    {object}  user.ConfirmationRegisterResp
+// @Failure      400    {object}  string
+// @Failure      500    {object}  string
+// @Router       /confirm/{email}/{code} [get]
 func (h Handler) ConfirmationRegister(c *gin.Context) {
 	codestr := c.Param("code")
 
@@ -122,128 +155,200 @@ func (h Handler) ConfirmationRegister(c *gin.Context) {
 		Code:  code,
 	}
 
-	res,err:=h.User.ConfirmationRegister(c,&req)
-	if err!=nil{
-		h.Log.Error("ConfirmationRegister funksiyasiga yuborishda xatolik.","error",err)
-		c.AbortWithStatusJSON(400,gin.H{
-			"error":err.Error(),
+	res, err := h.User.ConfirmationRegister(c, &req)
+	if err != nil {
+		h.Log.Error("ConfirmationRegister funksiyasiga yuborishda xatolik.", "error", err)
+		c.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200,res)
+	c.JSON(200, res)
 }
 
-func (h Handler) GetUSerByEmail(c *gin.Context){
-	req:=pb.GetUSerByEmailReq{
+// @Summary      Get user by email
+// @Description  This endpoint retrieves user details by email.
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        email  path      string  true  "User Email"
+// @Success      200    {object}  user.GetUSerByEmailResp
+// @Failure      500    {object}  string
+// @Router       /user/{email} [get]
+func (h Handler) GetUSerByEmail(c *gin.Context) {
+	req := pb.GetUSerByEmailReq{
 		Email: c.Param("email"),
 	}
 
-	res,err:=h.User.GetUSerByEmail(c,&req)
-	if err!=nil{
-		h.Log.Error("GetUSerByEmail funksiyasida xatolik.","error",err.Error())
-		c.AbortWithStatusJSON(500,gin.H{
-			"error":err.Error(),
+	res, err := h.User.GetUSerByEmail(c, &req)
+	if err != nil {
+		h.Log.Error("GetUSerByEmail funksiyasida xatolik.", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200,res)
+	c.JSON(200, res)
 }
 
-func (h Handler) UpdatePassword(c *gin.Context){
-	req:=pb.UpdatePasswordReq{
+// @Summary      Update user password
+// @Description  This endpoint updates the user password after validating the old password.
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        old_password  path      string  true  "Old Password"
+// @Param        new_password  path      string  true  "New Password"
+// @Param        email         path      string  true  "User Email"
+// @Success      200    {object}  user.UpdatePasswordResp
+// @Failure      401    {object}  string
+// @Failure      500    {object}  string
+// @Router       /user/update_password/{email}/{old_password}/{new_password} [put]
+func (h Handler) UpdatePassword(c *gin.Context) {
+	req := pb.UpdatePasswordReq{
 		OldPassword: c.Param("old password"),
 		NewPassword: c.Param("new password"),
-		Email: c.Param("email"),
+		Email:       c.Param("email"),
 	}
 
-	res,err:=h.User.UpdatePassword(c,&req)
-	if err!=nil{
-		h.Log.Error("UpdatePassword funksiyasiga malumot yuboishda xatolik.","error",err.Error())
-		c.AbortWithStatusJSON(500,gin.H{
-			"error":err.Error(),
+	req1 := pb.GetUSerByEmailReq{
+		Email: req.Email,
+	}
+
+	resemail, err := h.User.GetUSerByEmail(c, &req1)
+	if err != nil {
+		h.Log.Error("Email buyicha malumotlarni olishda xatolik", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200,res)
-}
-
-func (h Handler) ResetPassword(c *gin.Context){
-	req:=pb.ResetPasswordReq{
-		Email: c.Param("email"),
+	if err = bcrypt.CompareHashAndPassword([]byte(resemail.User.Password), []byte(req.OldPassword)); err != nil {
+		log.Printf("Password comparison failed: %v", err)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
 	}
 
-	res,err:=email.Email(req.Email)
-	if err!=nil{
-		h.Log.Error("Email ga xabar yuuborishda xatolik.","error",err.Error())
-		c.AbortWithStatusJSON(400,gin.H{
-			"error":err.Error(),
+	hashpassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		h.Log.Error(fmt.Sprintf("Pasworni hashlashda xatolik: %v", err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	req.NewPassword = string(hashpassword)
+
+	res, err := h.User.UpdatePassword(c, &req)
+	if err != nil {
+		h.Log.Error("UpdatePassword funksiyasiga malumot yuboishda xatolik.", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200,res)
+	c.JSON(200, res)
 }
 
-func (h Handler) ConfirmationPassword(c *gin.Context){
-	req:=pb.ConfirmationReq{}
+func (h Handler) ResetPassword(c *gin.Context) {
+	req := pb.ResetPasswordReq{
+		Email: c.Param("email"),
+	}
+
+	res, err := email.Email(req.Email)
+	if err != nil {
+		h.Log.Error("Email ga xabar yuuborishda xatolik.", "error", err.Error())
+		c.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, res)
+}
+
+func (h Handler) ConfirmationPassword(c *gin.Context) {
+	req := pb.ConfirmationReq{}
 
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
-	res,err:=h.User.ConfirmationPassword(c,&req)
-	if err!=nil{
-		h.Log.Error("ConfirmationPassword funksiyasiga malumot yuborishda xatolik","error",err.Error())
-		c.AbortWithStatusJSON(500,gin.H{
-			"error":err.Error(),
+	hashpassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		h.Log.Error(fmt.Sprintf("Pasworni hashlashda xatolik: %v", err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	req.NewPassword = string(hashpassword)
+
+	res, err := h.User.ConfirmationPassword(c, &req)
+	if err != nil {
+		h.Log.Error("ConfirmationPassword funksiyasiga malumot yuborishda xatolik", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200,res)
+	c.JSON(200, res)
 }
 
-func (h Handler) UpdateUser(c *gin.Context){
-	req:=pb.UpdateUserRequest{}
+func (h Handler) UpdateUser(c *gin.Context) {
+	req := pb.UpdateUserRequest{}
 
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
-	
-	res,err:=h.User.UpdateUser(c,&req)
-	if err!=nil{
-		h.Log.Error("UpdateUser funksiyasoga xabar yuborishda xatolik","error",err.Error())
-		c.AbortWithStatusJSON(500,gin.H{
-			"error":err.Error(),
+
+	res, err := h.User.UpdateUser(c, &req)
+	if err != nil {
+		h.Log.Error("UpdateUser funksiyasoga xabar yuborishda xatolik", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200,res)
+	c.JSON(200, res)
 }
 
-func (h Handler) DeleteUser(c *gin.Context){
-	req:=pb.UserId{
+func (h Handler) DeleteUser(c *gin.Context) {
+	req := pb.UserId{
 		Id: c.Param("id"),
 	}
 
-	res,err:=h.User.DeleteUser(c,&req)
-	if err!=nil{
-		h.Log.Error("DeleteUserga malumot yuborishda xatolik","error",err.Error())
-		c.AbortWithStatusJSON(500,gin.H{
-			"error":err.Error(),
+	res, err := h.User.DeleteUser(c, &req)
+	if err != nil {
+		h.Log.Error("DeleteUserga malumot yuborishda xatolik", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200,res)
+	c.JSON(200, res)
 }
 
-func (h Handler) UpdateRole(c *gin.Context){
-	
+func (h Handler) UpdateRole(c *gin.Context) {
+	req := pb.UpdateRoleReq{
+		Email: c.Param("email"),
+		Role:  c.Param("role"),
+	}
+
+	res, err := h.User.UpdateRole(c, &req)
+	if err != nil {
+		h.Log.Error("Update role ga malumot yuborishda xatolik", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, res)
 }
