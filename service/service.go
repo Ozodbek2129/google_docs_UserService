@@ -24,7 +24,7 @@ func NewUserService(db *sql.DB, Logger *slog.Logger) *UserService {
 	}
 }
 
-func (s *UserService) CreateUser(ctx context.Context, req *pb.RegisterReq) (*pb.RegisterRes, error) {
+func (s *UserService) Register(ctx context.Context, req *pb.RegisterReq) (*pb.RegisterRes, error) {
 	err := redis.RegisterUser(ctx, req)
 	if err != nil {
 		s.Logger.Error("failed to create user", err)
