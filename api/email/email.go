@@ -69,9 +69,6 @@ func SendCode(email string, code string) error {
         }
 
         // Sending email.
-        fmt.Println()
-        fmt.Println(code)
-        fmt.Println()
         err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
         if err != nil {
                 log.Fatalf("Error sending email: %v", err)

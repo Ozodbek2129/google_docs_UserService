@@ -68,12 +68,9 @@ func (h Handler) Register(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	// fmt.Println()
-	// fmt.Println(randomNumber)
-	// fmt.Println()
-
-	err = email.SendCode(req1.Email, string(randomNumber))
+	
+	myString := strconv.Itoa(randomNumber)
+	err = email.SendCode(req1.Email, myString)
 	if err!=nil{
 		h.Log.Error("Emailga xabar yuborishda xatolik","error",err.Error())
 		c.AbortWithStatusJSON(500,gin.H{
