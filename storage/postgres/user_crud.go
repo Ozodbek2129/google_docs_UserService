@@ -231,6 +231,19 @@ func (u *UserRepository) UpdateRole(ctx context.Context, req *pb.UpdateRoleReq) 
 	}, nil
 }
 
-func (u *UserRepository) ProfileImage(ctx context.Context,req *pb.ImageReq)(*pb.ImageRes,error){
-	return nil,nil
+func (u *UserRepository) ProfileImage(ctx context.Context,req *pb.ImageReq) (*pb.ImageRes,error) {
+	query := `
+		UPDATE users
+		SET image = $1,
+		    updated_at = CURRENT_TIMESTAMP
+		WHERE email = $2 AND deleted_at = 0`
+
+	_, err := u.Db.ExecContext(ctx, query, req.Image, req.Email)
+	if err != nil {
+		u.Log.Error("No user not found ", "email", req.Email)
+		return nil, errors.New("no user found")
+	}
+	return &pb.ImageRes{
+		Message: "Image uploaded successfully",
+	}, nil
 }

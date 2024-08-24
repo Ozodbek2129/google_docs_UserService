@@ -24,17 +24,17 @@ type Config struct {
 }
 
 func Load() Config {
-	if err := godotenv.Load(".env"); err != nil {
+	if err := godotenv.Load("/Users/macbookpro/go/src/github.com/GoogleDocs/google_docs_UserService/.env"); err != nil {
 		log.Print("No .env file found?")
 	}
 
 	config := Config{}
 	config.USER_SERVICE = cast.ToString(Coalesce("USER_SERVICE", ":1234"))
 	config.USER_ROUTER = cast.ToString(Coalesce("USER_ROUTER", ":2345"))
-	config.DB_USER = cast.ToString(Coalesce("DB_USER", "postgres"))
+	config.DB_USER = cast.ToString(Coalesce("DB_USER", "macbookpro"))
 	config.DB_HOST = cast.ToString(Coalesce("DB_HOST", "localhost"))
 	config.DB_NAME = cast.ToString(Coalesce("DB_NAME", "google_docs"))
-	config.DB_PASSWORD = cast.ToString(Coalesce("DB_PASSWORD", "salom"))
+	config.DB_PASSWORD = cast.ToString(Coalesce("DB_PASSWORD", "1111"))
 	config.DB_PORT = cast.ToInt(Coalesce("DB_PORT", 5432))
 	config.RD_HOST = cast.ToString(Coalesce("RD_HOST","localhost:6379"))
 	config.RD_PASSWORD = cast.ToString(Coalesce("RD_PASSWORD",""))

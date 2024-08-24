@@ -29,7 +29,7 @@ func TestConfirmationRegister(t *testing.T) {
 	defer db.Close()
 	storage := NewPostgresStorage(db, logger.NewLogger())
 	_, err = storage.User().ConfirmationRegister(context.Background(), &pb.ConfirmationRegisterReq{
-			Email: "ozodbek2129@gmail.com",
+			Email: "sanjarbeka775@gmail.com",
 			Code:  123456,
 	})
 	if err != nil {
