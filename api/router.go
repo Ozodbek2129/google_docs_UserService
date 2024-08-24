@@ -18,8 +18,8 @@ import (
 // @contact.email support@swagger.io
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-// @host          localhost:8888
-// @BasePath      /e-commerce
+// @host          localhost:2345
+// @BasePath      /
 func NewRouter(h *handler.Handler) *gin.Engine {
 	router := gin.Default()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

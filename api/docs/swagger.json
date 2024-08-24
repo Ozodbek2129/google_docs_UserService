@@ -14,8 +14,8 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8888",
-    "basePath": "/e-commerce",
+    "host": "localhost:2345",
+    "basePath": "/",
     "paths": {
         "/auth/confirm/{email}/{code}": {
             "get": {

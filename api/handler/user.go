@@ -49,15 +49,17 @@ func (h Handler) Register(c *gin.Context) {
 
 	req.Password = string(hashpassword)
 
-	rand.Seed(time.Now().UnixNano())
-	randomCode := rand.Intn(900000) + 100000
+	source := rand.NewSource(time.Now().UnixNano())
+	myRand := rand.New(source)
+
+	randomNumber := myRand.Intn(900000) + 100000
 
 	req1 := pb.RegisterReq{
 		Email:     req.Email,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 		Password:  req.Password,
-		Code:      int64(randomCode),
+		Code:      int64(randomNumber),
 	}
 
 	resp, err := h.User.Register(c, &req1)
@@ -67,7 +69,18 @@ func (h Handler) Register(c *gin.Context) {
 		return
 	}
 
-	email.SendCode(req1.Email, string(randomCode))
+	// fmt.Println()
+	// fmt.Println(randomNumber)
+	// fmt.Println()
+
+	err = email.SendCode(req1.Email, string(randomNumber))
+	if err!=nil{
+		h.Log.Error("Emailga xabar yuborishda xatolik","error",err.Error())
+		c.AbortWithStatusJSON(500,gin.H{
+			"Emailga xabar yuborishda xatolik":err.Error(),
+		})
+		return
+	}
 
 	c.JSON(http.StatusAccepted, resp)
 }

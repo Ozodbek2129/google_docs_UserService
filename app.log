@@ -1,0 +1,2 @@
+time=2024-08-24T14:07:17.892+05:00 level=ERROR msg="Kod stringdan int64 ga o'tkazishda xatolik: strconv.ParseInt: parsing \"yaxshi\": invalid syntax"
+time=2024-08-24T14:15:01.730+05:00 level=ERROR msg="Kod stringdan int64 ga o'tkazishda xatolik: strconv.ParseInt: parsing \"S\": invalid syntax"

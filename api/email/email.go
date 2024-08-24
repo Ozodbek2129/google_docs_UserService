@@ -49,25 +49,33 @@ func SendCode(email string, code string) error {
 
         t, err := template.ParseFiles("api/email/template.html")
         if err != nil {
-                log.Fatal(err)
+                log.Fatalf("Error parsing template: %v", err)
+                return err
         }
 
         var body bytes.Buffer
 
         mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
         body.Write([]byte(fmt.Sprintf("Subject: Your verification code \n%s\n\n", mimeHeaders)))
-        t.Execute(&body, struct {
+
+        err = t.Execute(&body, struct {
                 Passwd string
         }{
-
                 Passwd: code,
         })
-
-        // Sending email.
-        err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
         if err != nil {
+                log.Fatalf("Error executing template: %v", err)
                 return err
         }
-        fmt.Println("Email sended to:", email)
+
+        // Sending email.
+        fmt.Println()
+        fmt.Println(code)
+        fmt.Println()
+        err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
+        if err != nil {
+                log.Fatalf("Error sending email: %v", err)
+                return err
+        }
         return nil
 }

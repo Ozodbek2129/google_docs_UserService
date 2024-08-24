@@ -24,7 +24,7 @@ type Config struct {
 }
 
 func Load() Config {
-	if err := godotenv.Load("/Users/macbookpro/go/src/github.com/GoogleDocs/google_docs_UserService/.env"); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Print("No .env file found?")
 	}
 
