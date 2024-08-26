@@ -216,7 +216,7 @@ paths:
       summary: Login a user
       tags:
       - auth
-  /auth/products/media:
+  /auth/products/media/{email}:
     post:
       consumes:
       - multipart/form-data

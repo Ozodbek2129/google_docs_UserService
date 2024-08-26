@@ -68,7 +68,7 @@ func (h Handler) Register(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	myString := strconv.Itoa(randomNumber)
 	err = email.SendCode(req1.Email, myString)
 	if err!=nil{
@@ -100,6 +100,8 @@ func (h Handler) LoginUser(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
+
+	fmt.Println(req)
 
 	req1 := pb.GetUSerByEmailReq{
 		Email: req.Email,
@@ -160,6 +162,8 @@ func (h Handler) ConfirmationRegister(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Kod noto'g'ri formatda"})
 		return
 	}
+
+	fmt.Println(code)
 
 	req := pb.ConfirmationRegisterReq{
 		Email: c.Param("email"),
@@ -424,9 +428,11 @@ func (h Handler) UpdateRole(c *gin.Context) {
 // @Success 200 {object} string
 // @Failure 400 {object} string
 // @Failure 500 {object} string
-// @Router /auth/products/media [post]
+// @Router /auth/products/media/{email} [post]
 func (h Handler) UploadMedia(c *gin.Context) {
 	email := c.Param("email")
+
+	fmt.Println(email)
 
 	header, err := c.FormFile("file")
 	if err != nil {
@@ -435,7 +441,12 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		return
 	}
 
-	header.Filename = email
+	headerpath := filepath.Join("media", header.Filename) // Saqlash uchun fayl yo'li
+    if err := c.SaveUploadedFile(header, headerpath); err != nil {
+        log.Printf("Error saving file: %v\n", err)
+        c.JSON(500, gin.H{"error": "Failed to save file"})
+        return
+    }
 
 	url := filepath.Join("media", header.Filename)
 
@@ -443,6 +454,8 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		Image: url,
 		Email: email,
 	}
+
+	fmt.Println(req)
 
 	res, err := h.User.ProfileImage(c, &req)
 	if err != nil {

@@ -29,7 +29,8 @@ func (u *UserRepository) StoreRefreshToken(ctx context.Context, req *pb.StoreRef
 
 	query := `INSERT INTO refresh_token (user_id, token) VALUES ($1, $2) returning id`
 
-	err := u.Db.QueryRow(query, req.UserId, req.Refresh)
+	var id string
+	err := u.Db.QueryRow(query, req.UserId, req.Refresh).Scan(&id)
 	if err != nil {
 		u.Log.Error("Error storing refresh token", "error", err)
 		return nil, errors.ErrUnsupported
@@ -43,7 +44,7 @@ func (u *UserRepository) StoreRefreshToken(ctx context.Context, req *pb.StoreRef
 func (u *UserRepository) ConfirmationRegister(ctx context.Context, req *pb.ConfirmationRegisterReq) (*pb.ConfirmationRegisterRes, error) {
 
 	res, err := redis.GetUser(ctx, req.Email)
-	if err == nil {
+	if err != nil {
 		u.Log.Error("User already exists", "email", req.Email)
 		return nil, errors.New("user already exists")
 	}
@@ -76,7 +77,6 @@ func (u *UserRepository) ConfirmationRegister(ctx context.Context, req *pb.Confi
 	}, nil
 }
 
-
 func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error) {
 	var user pb.User
 	var createdAt, updatedAt string
@@ -99,7 +99,6 @@ func (u *UserRepository) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEm
 		User: &user,
 	}, nil
 }
-
 
 func (u *UserRepository) UpdatePassword(ctx context.Context, req *pb.UpdatePasswordReq) (*pb.UpdatePasswordRes, error) {
 
@@ -127,11 +126,10 @@ func (u *UserRepository) UpdatePassword(ctx context.Context, req *pb.UpdatePassw
 	}, nil
 }
 
-
 func (u *UserRepository) ConfirmationPassword(ctx context.Context, req *pb.ConfirmationReq) (*pb.ConfirmationResponse, error) {
 
 	query := `UPDATE users SET password = $1 WHERE email = $2 AND deleted_at = 0`
-	err := u.Db.QueryRow(query, req.NewPassword, req.Email)
+	_,err := u.Db.ExecContext(ctx,query, req.NewPassword, req.Email)
 	if err != nil {
 		u.Log.Error("No user found with email ", "email", req.Email)
 		return nil, errors.New("no user found")
@@ -209,29 +207,29 @@ func (u *UserRepository) DeleteUser(ctx context.Context, req *pb.UserId) (*pb.De
 
 func (u *UserRepository) UpdateRole(ctx context.Context, req *pb.UpdateRoleReq) (*pb.UpdateRoleRes, error) {
 	query := `UPDATE users SET role = $1 WHERE email = $2 AND deleted_at = 0`
-    res, err := u.Db.ExecContext(ctx, query, req.Role, req.Email)
-    if err!= nil {
-        u.Log.Error("Error updating role ", "err", err)
-        return nil, errors.ErrUnsupported
-    }
+	res, err := u.Db.ExecContext(ctx, query, req.Role, req.Email)
+	if err != nil {
+		u.Log.Error("Error updating role ", "err", err)
+		return nil, errors.ErrUnsupported
+	}
 
-    count, err := res.RowsAffected()
-    if err!= nil {
-        u.Log.Error("Error getting rows affected ", "err", err)
-        return nil, errors.ErrUnsupported
-    }
+	count, err := res.RowsAffected()
+	if err != nil {
+		u.Log.Error("Error getting rows affected ", "err", err)
+		return nil, errors.ErrUnsupported
+	}
 
-    if count == 0 {
-        u.Log.Error("No user not found ", "email", req.Email)
-        return nil, errors.New("no user found")
-    }
+	if count == 0 {
+		u.Log.Error("No user not found ", "email", req.Email)
+		return nil, errors.New("no user found")
+	}
 
-    return &pb.UpdateRoleRes{
+	return &pb.UpdateRoleRes{
 		Message: "Role updated successfully",
 	}, nil
 }
 
-func (u *UserRepository) ProfileImage(ctx context.Context,req *pb.ImageReq) (*pb.ImageRes,error) {
+func (u *UserRepository) ProfileImage(ctx context.Context, req *pb.ImageReq) (*pb.ImageRes, error) {
 	query := `
 		UPDATE users
 		SET image = $1,

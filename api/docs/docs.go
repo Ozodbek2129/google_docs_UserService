@@ -172,7 +172,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/products/media": {
+        "/auth/products/media/{email}": {
             "post": {
                 "description": "Api for upload a new photo",
                 "consumes": [

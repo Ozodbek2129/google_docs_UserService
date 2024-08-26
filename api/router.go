@@ -32,7 +32,7 @@ func NewRouter(h *handler.Handler) *gin.Engine {
 		user.GET("/reset_password/:email",h.ResetPassword)
 		user.POST("/confirmation_password",h.ConfirmationPassword)
 		user.PUT("/update_role/:email/:role",h.UpdateRole)
-		user.POST("/products/media",h.UploadMedia)
+		user.POST("/products/media/:email",h.UploadMedia)
 	}
 	return router
 }

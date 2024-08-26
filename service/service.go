@@ -53,7 +53,7 @@ func (s *UserService) ConfirmationRegister(ctx context.Context, req *pb.Confirma
 	return res, nil
 }
 
-func (s *UserService) GetUserByEmail(ctx context.Context, req *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error) {
+func (s *UserService) GetUSerByEmail(ctx context.Context, req *pb.GetUSerByEmailReq) (*pb.GetUserResponse, error) {
 	res, err := s.User.User().GetUserByEmail(ctx, req)
 	if err != nil {
 		s.Logger.Error("failed to get user by email", "error", err)
