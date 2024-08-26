@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"google_docs_user/config"
-	"google_docs_user/redis"
+	pb "google_docs_user/genproto/user"
+
+	"google_docs_user/storage/redis"
 
 	"github.com/go-redis/redismock/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	pb "google_docs_user/genproto/user"
 )
 
 func TestStoreCode(t *testing.T) {
