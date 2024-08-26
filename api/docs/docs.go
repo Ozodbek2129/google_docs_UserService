@@ -310,148 +310,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/update_role/{email}/{role}": {
-            "put": {
-                "description": "This endpoint updates the user's role based on the provided email and new role.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Update user role",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User Email",
-                        "name": "email",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "New User Role",
-                        "name": "role",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.UpdateRoleRes"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/delete_user/{id}": {
-            "delete": {
-                "description": "This endpoint deletes a user based on the provided user ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Delete user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.DeleteUserr"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/update_user": {
-            "put": {
-                "description": "This endpoint updates the user's details based on the provided information.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update user details",
-                "parameters": [
-                    {
-                        "description": "User Update Data",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.UpdateUserRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.UpdateUserRespose"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/update_password/{email}/{old_password}/{new_password}": {
+        "/auth/update_password/{email}/{old_password}/{new_password}": {
             "put": {
                 "description": "This endpoint updates the user password after validating the old password.",
                 "consumes": [
@@ -461,7 +320,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "auth"
                 ],
                 "summary": "Update user password",
                 "parameters": [
@@ -509,9 +368,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{email}": {
-            "get": {
-                "description": "This endpoint retrieves user details by email.",
+        "/auth/update_role/{email}/{role}": {
+            "put": {
+                "description": "This endpoint updates the user's role based on the provided email and new role.",
                 "consumes": [
                     "application/json"
                 ],
@@ -519,14 +378,21 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "auth"
                 ],
-                "summary": "Get user by email",
+                "summary": "Update user role",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "User Email",
                         "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New User Role",
+                        "name": "role",
                         "in": "path",
                         "required": true
                     }
@@ -535,7 +401,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.GetUserResponse"
+                            "$ref": "#/definitions/user.UpdateRoleRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
@@ -596,22 +468,6 @@ const docTemplate = `{
                 }
             }
         },
-        "user.DeleteUserr": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.GetUserResponse": {
-            "type": "object",
-            "properties": {
-                "user": {
-                    "$ref": "#/definitions/user.User"
-                }
-            }
-        },
         "user.LoginReq": {
             "type": "object",
             "properties": {
@@ -648,31 +504,6 @@ const docTemplate = `{
             }
         },
         "user.UpdateRoleRes": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.UpdateUserRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.UpdateUserRespose": {
             "type": "object",
             "properties": {
                 "message": {
@@ -722,6 +553,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "This is an API for e-commerce platform.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

@@ -30,16 +30,6 @@ definitions:
       message:
         type: string
     type: object
-  user.DeleteUserr:
-    properties:
-      message:
-        type: string
-    type: object
-  user.GetUserResponse:
-    properties:
-      user:
-        $ref: '#/definitions/user.User'
-    type: object
   user.LoginReq:
     properties:
       email:
@@ -63,22 +53,6 @@ definitions:
         type: string
     type: object
   user.UpdateRoleRes:
-    properties:
-      message:
-        type: string
-    type: object
-  user.UpdateUserRequest:
-    properties:
-      email:
-        type: string
-      first_name:
-        type: string
-      id:
-        type: string
-      last_name:
-        type: string
-    type: object
-  user.UpdateUserRespose:
     properties:
       message:
         type: string
@@ -309,127 +283,7 @@ paths:
       summary: Reset user password
       tags:
       - auth
-  /auth/update_role/{email}/{role}:
-    put:
-      consumes:
-      - application/json
-      description: This endpoint updates the user's role based on the provided email
-        and new role.
-      parameters:
-      - description: User Email
-        in: path
-        name: email
-        required: true
-        type: string
-      - description: New User Role
-        in: path
-        name: role
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.UpdateRoleRes'
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Update user role
-      tags:
-      - auth
-  /delete_user/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: This endpoint deletes a user based on the provided user ID.
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.DeleteUserr'
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Delete user
-      tags:
-      - user
-  /update_user:
-    put:
-      consumes:
-      - application/json
-      description: This endpoint updates the user's details based on the provided
-        information.
-      parameters:
-      - description: User Update Data
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/user.UpdateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.UpdateUserRespose'
-        "400":
-          description: Bad Request
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Update user details
-      tags:
-      - user
-  /user/{email}:
-    get:
-      consumes:
-      - application/json
-      description: This endpoint retrieves user details by email.
-      parameters:
-      - description: User Email
-        in: path
-        name: email
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.GetUserResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Get user by email
-      tags:
-      - user
-  /user/update_password/{email}/{old_password}/{new_password}:
+  /auth/update_password/{email}/{old_password}/{new_password}:
     put:
       consumes:
       - application/json
@@ -468,5 +322,40 @@ paths:
             type: string
       summary: Update user password
       tags:
-      - user
+      - auth
+  /auth/update_role/{email}/{role}:
+    put:
+      consumes:
+      - application/json
+      description: This endpoint updates the user's role based on the provided email
+        and new role.
+      parameters:
+      - description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: New User Role
+        in: path
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UpdateRoleRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update user role
+      tags:
+      - auth
 swagger: "2.0"
