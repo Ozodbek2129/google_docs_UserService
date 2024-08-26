@@ -26,3 +26,8 @@ time=2024-08-24T15:29:55.639+05:00 level=ERROR msg="storefreshtokenda xatolik: r
 time=2024-08-24T15:41:01.744+05:00 level=ERROR msg="No user found with email " email=ozodbekshamsiddinov1504@gmail.com
 time=2024-08-24T15:41:01.744+05:00 level=ERROR msg="failed to confirmation password" error="no user found"
 time=2024-08-24T15:41:01.744+05:00 level=ERROR msg="ConfirmationPassword funksiyasiga malumot yuborishda xatolik" error="rpc error: code = Unknown desc = no user found"
+time=2024-08-26T18:07:18.318+05:00 level=ERROR msg="No user found" email=ozodbekshamsiddino1504@gmail.com
+time=2024-08-26T18:07:18.318+05:00 level=ERROR msg="failed to get user by email" error="no user found"
+time=2024-08-26T18:07:18.319+05:00 level=ERROR msg="Email buyicha malumotlarni olishda xatolik" error="rpc error: code = Unknown desc = no user found"
+time=2024-08-26T18:13:17.697+05:00 level=ERROR msg="Error deleting " user="pq: invalid input syntax for type bigint: \"2024-08-26 18:13:17.6876792+05:00\""
+time=2024-08-26T18:13:17.697+05:00 level=ERROR msg="failed to delete user" error="unsupported operation"
