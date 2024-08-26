@@ -14,10 +14,6 @@ const docTemplate = `{
             "name": "API Support",
             "email": "support@swagger.io"
         },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -546,10 +542,10 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:2345",
+	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "E-Commerce API",
+	Title:            "Google_docs_user API",
 	Description:      "This is an API for e-commerce platform.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

@@ -2,19 +2,14 @@
     "swagger": "2.0",
     "info": {
         "description": "This is an API for e-commerce platform.",
-        "title": "E-Commerce API",
+        "title": "Google_docs_user API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
             "email": "support@swagger.io"
         },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
         "version": "1.0"
     },
-    "host": "localhost:2345",
     "basePath": "/",
     "paths": {
         "/auth/confirm/{email}/{code}": {

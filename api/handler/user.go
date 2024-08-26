@@ -381,11 +381,11 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		return
 	}
 
-	err = minioClient.MakeBucket(context.Background(), "photos", minio.MakeBucketOptions{})
-	if err != nil {
-		c.AbortWithError(500, err)
-		return
-	}
+	// err = minioClient.MakeBucket(context.Background(), "photos", minio.MakeBucketOptions{})
+	// if err != nil {
+	// 	c.AbortWithError(500, err)
+	// 	return
+	// }
 
 	info, err := minioClient.FPutObject(context.Background(), "photos", newFile, fileUrl, minio.PutObjectOptions{
 		ContentType: "image/jpeg",

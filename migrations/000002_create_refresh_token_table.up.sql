@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users(
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     password TEXT NOT NULL,
-    image VARCHAR DEFAULT 'image',
+    image TEXT DEFAULT 'image',
     role role NOT NULL DEFAULT 'user',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
