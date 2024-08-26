@@ -10,15 +10,12 @@ import (
 	_ "google_docs_user/api/docs"
 )
 
-// @title        E-Commerce API
+// @title        Google_docs_user API
 // @version      1.0
 // @description  This is an API for e-commerce platform.
 // @termsOfService http://swagger.io/terms/
 // @contact.name  API Support
 // @contact.email support@swagger.io
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-// @host          localhost:2345
 // @BasePath      /
 func NewRouter(h *handler.Handler) *gin.Engine {
 	router := gin.Default()
