@@ -242,6 +242,7 @@ func (u *UserRepository) ProfileImage(ctx context.Context, req *pb.ImageReq) (*p
 		return nil, errors.New("no user found")
 	}
 	fmt.Println("Image updated successfully")
+	fmt.Println(req)
 	return &pb.ImageRes{
 		Message: "Image uploaded successfully",
 	}, nil
