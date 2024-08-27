@@ -1,0 +1,54 @@
+services:
+  postgres-db:
+    container_name: postgres
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=google_docs
+    ports:
+      - "5433:5432"
+    volumes:
+      - db:/data/postgres
+    networks:
+      - google
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - google
+    
+  migrate:
+    image: migrate/migrate
+    networks:
+      - google
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - postgres-db
+    command: ["-path", "./migrations", "-database" ,"postgres://postgres:1234@postgres:5432/google_docs?sslmode=disable","up"]
+
+  userservice:
+    container_name: user
+    build: .
+    ports:
+      - "1234:1234"
+      - "2345:2345"
+    networks:
+     - google
+    depends_on:
+      - postgres-db
+      - migrate
+      - redis
+
+networks:
+  google:
+    external: true
+
+volumes:
+  db:
+  postgres-db:
+  

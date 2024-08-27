@@ -19,7 +19,7 @@ type Handler struct {
 
 func NewHandler() *Handler {
 
-	conn, err := grpc.NewClient(config.Load().USER_SERVICE, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(config.Load().USER_SERVICE, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 			log.Println("error while connecting authentication service ", err)
 	}
