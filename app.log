@@ -1,0 +1,3 @@
+time=2024-08-26T19:00:04.294+05:00 level=ERROR msg="Error inserting user" err="pq: duplicate key value violates unique constraint \"users_email_key\""
+time=2024-08-26T19:00:04.294+05:00 level=ERROR msg="failed to confirmation register" error="pq: duplicate key value violates unique constraint \"users_email_key\""
+time=2024-08-26T19:00:04.298+05:00 level=ERROR msg="ConfirmationRegister funksiyasiga yuborishda xatolik." error="rpc error: code = Unknown desc = pq: duplicate key value violates unique constraint \"users_email_key\""

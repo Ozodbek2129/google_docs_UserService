@@ -373,7 +373,7 @@ func (h Handler) UploadMedia(c *gin.Context) {
 	newFile := uuid.NewString() + fileExt 
 
 	minioClient, err := minio.New("localhost:9000", &minio.Options{
-		Creds:  credentials.NewStaticV4("minio", "minioadmin", ""),
+		Creds:  credentials.NewStaticV4("test", "minioadmin", ""),
 		Secure: false,
 	})
 	if err != nil {
