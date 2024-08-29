@@ -19,9 +19,10 @@ import (
 // @BasePath      /
 func NewRouter(h *handler.Handler) *gin.Engine {
 	router := gin.Default()
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Use(handler.CORSMiddleware())
+	
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	user := router.Group("/auth")
 	{
