@@ -34,8 +34,9 @@ jobs:
               git pull
             else
               echo "Directory does not exist. Cloning repository..."
-              git clone https://github.com/Ozodbek2129/google_docs_UserService.git GoogleDocs
+              mkdir GoogleDocs
               cd GoogleDocs
+              git clone git@github.com:Ozodbek2129/google_docs_UserService.git
             fi
 
             # Stop and remove existing Docker containers
