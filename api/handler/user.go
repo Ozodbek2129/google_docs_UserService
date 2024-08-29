@@ -416,8 +416,6 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Fayl yuklandi:", newFile)
-
 	objUrl, err := minioClient.PresignedGetObject(context.Background(), bucketName, newFile, time.Hour*24, nil)
 	if err != nil {
 		c.JSON(400, gin.H{
