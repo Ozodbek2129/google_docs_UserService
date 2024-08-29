@@ -58,7 +58,7 @@ services:
       - MINIO_ROOT_PASSWORD=minioadmin
       - MINIO_DEFAULT_BUCKETS=photos
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://18.171.153.211:9000/minio/health/live || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://3.65.0.245:9000/minio/health/live || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 5
