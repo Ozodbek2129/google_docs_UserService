@@ -390,6 +390,8 @@ func (h Handler) UploadMedia(c *gin.Context) {
 	info, err := minioClient.FPutObject(context.Background(), "photos", newFile, fileUrl, minio.PutObjectOptions{
 		ContentType: "image/jpeg",
 	})
+	fmt.Println("rasm")
+	fmt.Println(newFile)
 	if err!= nil {
         c.AbortWithError(500, err)
         return

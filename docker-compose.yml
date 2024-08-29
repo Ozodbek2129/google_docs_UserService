@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgres-db:
     container_name: postgres
@@ -29,7 +31,7 @@ services:
       - ./migrations:/migrations
     depends_on:
       - postgres-db
-    command: ["-path", "./migrations", "-database" ,"postgres://postgres:1234@postgres:5432/google_docs?sslmode=disable","up"]
+    command: ["-path", "./migrations", "-database", "postgres://postgres:1234@postgres:5432/google_docs?sslmode=disable", "up"]
 
   userservice:
     container_name: user
@@ -44,6 +46,25 @@ services:
       - migrate
       - redis
 
+  minio:
+    image: docker.io/bitnami/minio:2024
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_DEFAULT_BUCKETS=photos
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - google
+
 networks:
   google:
     external: true
@@ -51,4 +72,4 @@ networks:
 volumes:
   db:
   postgres-db:
-  
+  minio_data:
