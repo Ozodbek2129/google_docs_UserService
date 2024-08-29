@@ -403,32 +403,7 @@ func (h Handler) UploadMedia(c *gin.Context) {
 			})
 			return
 		}
-		fmt.Println("Yangi bucket yaratildi:", bucketName)
 	} else {
-		fmt.Println("Bucket allaqachon mavjud:", bucketName)
-	}
-
-	policy := fmt.Sprintf(`{
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": ["*"]
-                },
-                "Action": ["s3:GetObject"],
-                "Resource": ["arn:aws:s3:::%s/*"]
-            }
-        ]
-    }`, bucketName)
-
-	err = minioClient.SetBucketPolicy(context.Background(), bucketName, policy)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error policy": err.Error(),
-		})
-		log.Println(err.Error())
-		return
 	}
 
 	_, err = minioClient.FPutObject(context.Background(), bucketName, newFile, fileUrl, minio.PutObjectOptions{
