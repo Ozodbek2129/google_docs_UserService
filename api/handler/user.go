@@ -374,7 +374,7 @@ func (h Handler) UploadMedia(c *gin.Context) {
 
 	newFile := uuid.NewString() + fileExt
 
-	minioClient, err := minio.New("3.65.0.245:9000", &minio.Options{
+	minioClient, err := minio.New("minio:9000", &minio.Options{
 		Creds:  credentials.NewStaticV4("test", "minioadmin", ""),
 		Secure: false,
 	})

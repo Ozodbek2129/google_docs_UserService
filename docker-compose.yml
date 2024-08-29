@@ -47,6 +47,7 @@ services:
       - redis
 
   minio:
+    container_name: minio
     image: docker.io/bitnami/minio:2024
     ports:
       - '9000:9000'
