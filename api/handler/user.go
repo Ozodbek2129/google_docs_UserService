@@ -75,10 +75,10 @@ func (h Handler) Register(c *gin.Context) {
 
 	myString := strconv.Itoa(randomNumber)
 	err = email.SendCode(req1.Email, myString)
-	if err!=nil{
-		h.Log.Error("Emailga xabar yuborishda xatolik","error",err.Error())
-		c.AbortWithStatusJSON(500,gin.H{
-			"Emailga xabar yuborishda xatolik":err.Error(),
+	if err != nil {
+		h.Log.Error("Emailga xabar yuborishda xatolik", "error", err.Error())
+		c.AbortWithStatusJSON(500, gin.H{
+			"Emailga xabar yuborishda xatolik": err.Error(),
 		})
 		return
 	}
@@ -368,9 +368,7 @@ func (h Handler) UploadMedia(c *gin.Context) {
 
 	fileExt := filepath.Ext(file.File.Filename)
 
-	fmt.Println(fileExt)
-
-	newFile := uuid.NewString() + fileExt 
+	newFile := uuid.NewString() + fileExt
 
 	minioClient, err := minio.New("18.171.153.211:9000", &minio.Options{
 		Creds:  credentials.NewStaticV4("test", "minioadmin", ""),
@@ -381,29 +379,63 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		return
 	}
 
-	// err = minioClient.MakeBucket(context.Background(), "photos", minio.MakeBucketOptions{})
-	// if err != nil {
-	// 	c.AbortWithError(500, err)
-	// 	return
-	// }
+	bucketName := "photos"
 
-	info, err := minioClient.FPutObject(context.Background(), "photos", newFile, fileUrl, minio.PutObjectOptions{
+	exists, err := minioClient.BucketExists(context.Background(), bucketName)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	if !exists {
+		err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			c.AbortWithError(500, err)
+			return
+		}
+		fmt.Println("Yangi bucket yaratildi:", bucketName)
+	} else {
+		fmt.Println("Bucket allaqachon mavjud:", bucketName)
+	}
+
+	policy := fmt.Sprintf(`{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": ["*"]
+                },
+                "Action": ["s3:GetObject"],
+                "Resource": ["arn:aws:s3:::%s/*"]
+            }
+        ]
+    }`, bucketName)
+
+	err = minioClient.SetBucketPolicy(context.Background(), bucketName, policy)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error policy": err.Error(),
+		})
+		log.Println(err.Error())
+		return
+	}
+
+	_, err = minioClient.FPutObject(context.Background(), bucketName, newFile, fileUrl, minio.PutObjectOptions{
 		ContentType: "image/jpeg",
 	})
-	fmt.Println("rasm")
-	fmt.Println(newFile)
-	if err!= nil {
-        c.AbortWithError(500, err)
-        return
-    }
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
 
-	fmt.Println(info.Bucket)
+	fmt.Println("Fayl yuklandi:", newFile)
 
-	objUrl, err := minioClient.PresignedGetObject(context.Background(), "photos", newFile, time.Hour*24, nil)
-	if err!= nil {
-        c.AbortWithError(500, err)
-        return
-    }
+	objUrl, err := minioClient.PresignedGetObject(context.Background(), bucketName, newFile, time.Hour*24, nil)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
 
 	req := pb.ImageReq{Image: objUrl.String(), Email: email}
 
