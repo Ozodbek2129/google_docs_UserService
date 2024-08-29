@@ -354,7 +354,9 @@ func (h Handler) UploadMedia(c *gin.Context) {
 
 	err := c.ShouldBind(&file)
 	if err != nil {
-		c.AbortWithError(400, err)
+		c.JSON(400, gin.H{
+			"error":err.Error(),
+		})
 		return
 	}
 
@@ -362,7 +364,9 @@ func (h Handler) UploadMedia(c *gin.Context) {
 
 	err = c.SaveUploadedFile(&file.File, fileUrl)
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.JSON(400, gin.H{
+			"error":err.Error(),
+		})
 		return
 	}
 
@@ -375,7 +379,9 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		Secure: false,
 	})
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.JSON(400, gin.H{
+			"error":err.Error(),
+		})
 		return
 	}
 
@@ -383,14 +389,18 @@ func (h Handler) UploadMedia(c *gin.Context) {
 
 	exists, err := minioClient.BucketExists(context.Background(), bucketName)
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.JSON(400, gin.H{
+			"error":err.Error(),
+		})
 		return
 	}
 
 	if !exists {
 		err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
 		if err != nil {
-			c.AbortWithError(500, err)
+			c.JSON(400, gin.H{
+				"error":err.Error(),
+			})
 			return
 		}
 		fmt.Println("Yangi bucket yaratildi:", bucketName)
@@ -425,7 +435,9 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		ContentType: "image/jpeg",
 	})
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.JSON(400, gin.H{
+			"error":err.Error(),
+		})
 		return
 	}
 
@@ -433,7 +445,9 @@ func (h Handler) UploadMedia(c *gin.Context) {
 
 	objUrl, err := minioClient.PresignedGetObject(context.Background(), bucketName, newFile, time.Hour*24, nil)
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.JSON(400, gin.H{
+			"error":err.Error(),
+		})
 		return
 	}
 
