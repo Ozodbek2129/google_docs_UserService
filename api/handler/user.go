@@ -403,7 +403,6 @@ func (h Handler) UploadMedia(c *gin.Context) {
 			})
 			return
 		}
-	} else {
 	}
 
 	_, err = minioClient.FPutObject(context.Background(), bucketName, newFile, fileUrl, minio.PutObjectOptions{
@@ -413,6 +412,29 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		c.JSON(400, gin.H{
 			"error":err.Error(),
 		})
+		return
+	}
+
+	policy := fmt.Sprintf(`{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": ["*"]
+                },
+                "Action": ["s3:GetObject"],
+                "Resource": ["arn:aws:s3:::%s/*"]
+            }
+        ]
+    }`, bucketName)
+
+	err = minioClient.SetBucketPolicy(context.Background(), bucketName, policy)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"Message": err.Error(),
+		})
+		log.Println(err.Error())
 		return
 	}
 
@@ -435,7 +457,11 @@ func (h Handler) UploadMedia(c *gin.Context) {
 		return
 	}
 
+	maduUrl := fmt.Sprintf("http://3.65.0.245:9000/photos/%s", newFile)
+
 	c.JSON(201, gin.H{
 		"obj": objUrl.String(),
+		"madeUrl": maduUrl,
+        
 	})
 }
