@@ -30,7 +30,8 @@ services:
     volumes:
       - ./migrations:/migrations
     depends_on:
-      - postgres-db
+      postgres-db:
+        condition: service_healthy
     command: ["-path", "./migrations", "-database", "postgres://postgres:1234@postgres:5432/google_docs?sslmode=disable", "up"]
 
   userservice:
@@ -42,9 +43,12 @@ services:
     networks:
      - google
     depends_on:
-      - postgres-db
-      - migrate
-      - redis
+      postgres-db:
+        condition: service_healthy
+      migrate:
+        condition: service_started
+      redis:
+        condition: service_healthy
 
   minio:
     container_name: minio
@@ -68,9 +72,7 @@ services:
 
 networks:
   google:
-    external: true
 
 volumes:
   db:
-  postgres-db:
   minio_data:
