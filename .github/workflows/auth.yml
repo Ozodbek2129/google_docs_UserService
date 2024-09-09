@@ -9,6 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,7 +39,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            # Check if the directory exists
             if [ -d "Google_docs" ]; then
               echo "Directory exists. Pulling latest changes..."
               cd Google_docs/google_docs_UserService
@@ -45,8 +50,5 @@ jobs:
               git clone git@github.com:Ozodbek2129/google_docs_UserService.git
             fi
 
-            # Stop and remove existing Docker containers
             docker compose down
-
-            # Build and start Docker containers
             docker compose up -d --build
