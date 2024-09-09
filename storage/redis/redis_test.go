@@ -54,15 +54,15 @@ func TestGetUser(t *testing.T) {
 	ctx := context.Background()
 
 	user := &pb.RegisterReq{
-		Email:    "test@gmail.com",
+		Email:    "sanjarbeka775@gmail.com",
 		FirstName: "salombek",
 		LastName: "salombekov",
 		Password: "password",
 		Role: "admin",
-		Code: 12345,
+		Code: 123456,
 	}
 
-	gotUser, err := redis.GetUser(ctx, "test@gmail.com")
+	gotUser, err := redis.GetUser(ctx, "sanjarbeka775@gmail.com")
 	require.NoError(t, err)
 	assert.Equal(t, user, gotUser)
 }
