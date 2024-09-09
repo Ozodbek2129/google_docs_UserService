@@ -38,12 +38,12 @@ func TestRegisterUser(t *testing.T) {
 	ctx := context.Background()
 
 	user := &pb.RegisterReq{
-		Email:    "test@gmail.com",
+		Email:    "sanjarbeka775@gmail.com",
 		FirstName: "salombek",
 		LastName: "salombekov",
 		Password: "password",
 		Role: "admin",
-		Code: 12345,
+		Code: 123456,
 	}
 
 	err := redis.RegisterUser(ctx, user)
