@@ -16,6 +16,12 @@ jobs:
       - name: Install Dependencies
         run: go mod download
 
+      - name: Run Redis Tests
+        run: go test -v ./storage/redis/redis_test.go
+
+      - name: Run User Tests
+        run: go test -v ./storage/postgres/user_test.go
+
       - name: Build
         run: go build -v ./...
 
@@ -44,4 +50,3 @@ jobs:
 
             # Build and start Docker containers
             docker compose up -d --build
-
